@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/static//css/font.css">
+    <link rel="stylesheet" href="/static//css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/static//lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static//js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+      <link rel="stylesheet" href="/static/sweetalert/sweetalert.css">
+      <script src="/static/sweetalert/ions_alert.js"></script>
+      <script src="/static/sweetalert/sweetalert.min.js"></script>
+  </head>
+  
+  <body>
+    <div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">财务中心</a>
+        <a>
+          <cite>工资条</cite></a>
+      </span>
+      <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+      <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so">
+          <input class="layui-input" placeholder="选择月份" id="salary_month">
+          <button id="search_btn" class="layui-btn"><i class="layui-icon">&#xe615;</i></button>
+          <button id="clear_btn" class="layui-btn"><i class="layui-icon" style="line-height:30px">ဂ</i></button>
+        </form>
+      </div>
+
+
+        <xblock>
+            <button class="layui-btn" onclick="x_admin_show('工资条导入','{{urlfor "CaiWuSalarySlipController.ToImportExcel"}}',600,400)"><i class="layui-icon"></i>导入excel</button>
+            <span class="x-right" style="line-height:40px">共有数据：{{.count}} 条</span>
+        </xblock>
+
+
+
+      <table class="layui-table">
+        <thead>
+          <tr>
+
+            <th>工号</th>
+            <th>工资月份</th>
+            <th>工作天数</th>
+            <th>奖金</th>
+            <th>罚金</th>
+            <th>实发工资</th>
+            <th>操作</th>
+        </thead>
+        <tbody>
+
+
+        {{range .salary_slips}}
+            <tr>
+              <td>{{.CardId}}</td>
+              <td>{{.PayDate}}</td>
+              <td>{{.WorkingDays}}</td>
+              <td>{{.Reward}}</td>
+              <td>{{.Fine}}</td>
+              <td>{{.NetSalary}}</td>
+              <td class="td-manage">
+                  <a style="cursor: pointer" title="查看详情" onclick="x_admin_show('查看详情','{{urlfor "SalarySlipController.Detail"}}?id={{.Id}}',600,400)">
+                      <i class="layui-icon">&#xe642;</i>
+                  </a>
+              </td>
+            </tr>
+        {{end}}
+
+
+
+
+        </tbody>
+      </table>
+
+        <div class="page">
+            <div>
+                <span>总页数:{{.countPage}}</span>
+            {{/*首页和上一页*/}}
+            {{/*<a class="prev" href="{{urlfor "UserController.Get"}}?page={{.page_map.firstpage}}">&lt;&lt;</a>*/}}
+                <a class="prev" href="{{urlfor "CaiWuSalarySlipController.Get"}}?page={{.page_map.firstpage}}&month={{.kw}}">首页</a>
+            {{/*<a class="prev" href="{{urlfor "UserController.Get"}}?page={{.prePage}}">&lt;</a>*/}}
+                <a class="prev" href="{{urlfor "CaiWuSalarySlipController.Get"}}?page={{.prePage}}&month={{.kw}}">上一页</a>
+
+            {{/*中间页码*/}}
+            {{range .page_map.num_pages}}
+            {{if eq $.page_map.currpage .}}
+                <a style="border: 0px  #E2E2E2;padding: 0" href="{{urlfor "CaiWuSalarySlipController.Get"}}?page={{.}}&month={{$.kw}}"><span class="current">{{.}}</span></a>
+            {{else}}
+                <a style="border: 0px #E2E2E2;padding: 0" href="{{urlfor "CaiWuSalarySlipController.Get"}}?page={{.}}&month={{$.kw}}"><span>{{.}}</span></a>
+            {{end}}
+
+            {{end}}
+
+
+            {{/*下一页和尾页*/}}
+            {{/*<a class="next" href="{{urlfor "UserController.Get"}}?page={{.nextPage}}">&gt;</a>*/}}
+                <a class="next" href="{{urlfor "CaiWuSalarySlipController.Get"}}?page={{.nextPage}}&month={{.kw}}">下一页</a>
+            {{/*<a class="next" href="{{urlfor "UserController.Get"}}?page={{.page_map.lastpage}}">&gt;&gt;</a>*/}}
+                <a class="next" href="{{urlfor "CaiWuSalarySlipController.Get"}}?page={{.page_map.lastpage}}&month={{.kw}}">尾页</a>
+            </div>
+        </div>
+
+    </div>
+    <script>
+      layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#salary_month', //指定元素
+            type:'month'
+        });
+      });
+
+
+
+
+      var search_btn = document.getElementById("search_btn");
+
+      search_btn.onclick = function (ev) {
+          ev.preventDefault();
+          var month = document.getElementById("salary_month").value;
+          window.location.href = "{{urlfor "CaiWuSalarySlipController.Get"}}?month="+month
+      };
+
+
+      var clear_btn = document.getElementById("clear_btn");
+
+      clear_btn.onclick = function (ev) {
+          ev.preventDefault();
+          window.location.href = "{{urlfor "CaiWuSalarySlipController.Get"}}"
+      }
+
+
+    </script>
+
+  </body>
+
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/static/css/font.css">
+    <link rel="stylesheet" href="/static/css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+      <script type="text/javascript" src="/static/lib/layui/layui.js" charset="utf-8"></script>
+      <!--会冲突-->
+      <!--<script type="text/javascript" src="./js/xadmin.js"></script>-->
+
+      <link rel="stylesheet" href="/static/css/bootstrap-chosen.css">
+
+      <script type="text/javascript" src="/static/js/chosen.jquery.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+      <link rel="stylesheet" href="/static/sweetalert/sweetalert.css">
+      <script src="/static/sweetalert/ions_alert.js"></script>
+      <script src="/static/sweetalert/sweetalert.min.js"></script>
+  </head>
+  
+  <body>
+    <div class="x-body">
+        <form class="layui-form" action="" lay-filter="component-form-group">
+            <div class="layui-form-item">
+                <label class="layui-form-label">角色名称</label>
+                <div class="layui-input-inline" style="width:200px;">
+                    <input type="text" value="{{.role.RoleName}}" autocomplete="off" class="layui-input" disabled>
+                </div>
+            </div>
+
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">角色描述</label>
+                <div class="layui-input-inline" style="width:200px;">
+                    <input type="text" value="{{.role.Desc}}" autocomplete="off" class="layui-input" disabled>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">添加用户</label>
+                <div class="layui-input-block">
+                    <select data-placeholder="请选择..." class="chosen-select" multiple style="width:350px;" tabindex="4" id="role_user_select">
+                        {{/*<option value="用户1">用户1</option>*/}}
+                        {{/*<option value="用户2">用户2</option>*/}}
+                        {{/*<option value="用户3">用户3</option>*/}}
+                        {{/*<option value="用户4">用户4</option>*/}}
+                        {{/*<option value="用户5">用户5</option>*/}}
+                        {{range .role.User}}
+                            <option value="{{.Id}}" selected>{{.UserName}}</option>
+                        {{end}}
+
+                        {{range .users}}
+                            <option value="{{.Id}}">{{.UserName}}</option>
+                        {{end}}
+
+                    </select>
+                </div>
+            </div>
+
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <div class="layui-footer" >
+                        {{/*<input type="hidden" value="{{.role.Id}}" id="role_id">*/}}
+                    <button lay-filter="add" lay-submit class="layui-btn"  id="role_user_add_btn">立即提交</button>
+                    <a href="#" class="layui-btn layui-btn-primary">返回</a>
+                </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <script>
+        $('.chosen-select').chosen({width: "100%"});
+
+        // js获取多选框数据：
+        //
+        // var role_user_select_list=[];
+        // // //获取多选框的值
+        // $("#role_user_select :selected").each(function(){
+        //     role_user_select_list.push($(this).val());
+        // });
+
+
+        var role_user_add_btn = document.getElementById("role_user_add_btn");
+        role_user_add_btn.onclick = function (ev) {
+            var role_id = "{{.role.Id}}";
+
+            var user_ids = "";
+            var i = 0;
+            $("#role_user_select :selected").each(function () {
+                if(i == 0){
+                    user_ids = $(this).val()
+                }else {
+                    user_ids = user_ids + "," + $(this).val()
+                }
+                i ++
+
+            });
+            $.ajax({
+                url:"{{urlfor "RoleController.DoRoleUser"}}",
+                type:"POST",
+                data:{
+                    "role_id":role_id,
+                    "user_ids":user_ids
+                },
+                success:function (data) {
+
+                    if (data["code"] == 200){
+                        alert(data["msg"]);
+                        // 获得frame索引
+                        var index = parent.layer.getFrameIndex(window.name);
+                        //关闭当前frame
+                        parent.layer.close(index);
+                        window.location.href = "{{urlfor "RoleController.List"}}"
+                        // ions_alert.alertSuccessToast(data["msg"]);
+                        // setTimeout(reload_list,2000)
+                    }else {
+                        ions_alert.alertErrorToast("插入失败");
+                        setTimeout(reload_list,2000)
+                    }
+                    
+
+                },
+                fail:function (data) {
+                    ions_alert.alertErrorToast("插入失败");
+                    setTimeout(reload_list,2000)
+
+                }
+            })
+        };
+
+
+    </script>
+
+
+  </body>
+
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/static/css/font.css">
+    <link rel="stylesheet" href="/static/css/xadmin.css">
+
+      <link rel="stylesheet" href="/static/css/bootstrapStyle/bootstrapStyle.css" type="text/css">
+      <script type="text/javascript" src="/static/js/ztree/jquery.min.js"></script>
+      <script type="text/javascript" src="/static/js/ztree/jquery.ztree.core.js"></script>
+      <script type="text/javascript" src="/static/js/ztree/jquery.ztree.excheck.js"></script>
+      <script type="text/javascript" src="/static/js/ztree/jquery.ztree.exedit.js"></script>
+
+
+  </head>
+  
+  <body>
+    <div class="x-body">
+        <form class="layui-form" action="" lay-filter="component-form-group">
+            <div class="layui-form-item">
+                <label class="layui-form-label">角色名称</label>
+                <div class="layui-input-inline" style="width:200px;">
+                    <input type="text" value="{{.role.RoleName}}" autocomplete="off" class="layui-input" readonly="readonly">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">角色描述</label>
+                <div class="layui-input-inline" style="width:200px;">
+                    <input type="text" value="{{.role.Desc}}" autocomplete="off" class="layui-input" readonly="readonly">
+                </div>
+            </div>
+
+
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">权限树</label>
+                <div class="layui-input-block">
+                    <ul id="treeDemo" class="ztree"></ul>
+                </div>
+
+
+                <input type="hidden" id="role_id" value="{{.role.Id}}">
+                <input type="hidden" id="auth_ids" value="">
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <div class="layui-footer" >
+                            <button class="layui-btn" id="role_auth_add_btn">
+                                立即提交
+                            </button>
+                            <a href="#" class="layui-btn layui-btn-primary">返回</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+    <SCRIPT type="text/javascript">
+        var role_id = document.getElementById("role_id").value;
+       $.ajax({
+           url:"{{urlfor "RoleController.GetAuthJson"}}",
+           type:"GET",
+           data:{
+               "role_id":role_id
+           },
+           success:function (data) {
+               var  zNodes = data["auth_arr_map"];
+               var auth_ids_has = data["auth_ids_has"];
+
+               var setting = {
+                   view: {
+                       // addHoverDom: addHoverDom,
+                       // removeHoverDom: removeHoverDom,
+                       selectedMulti: false
+                   },
+                   check: {
+                       enable: true
+                   },
+                   data: {
+                       simpleData: {
+                           enable: true
+                       }
+                   },
+                   edit: {
+                       enable: true
+                   },
+                   callback:{
+                       beforeCheck:true,
+                       onCheck:check_data
+                   }
+               };
+
+
+
+               $(document).ready(function(){
+                   $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+
+                   var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+
+                   for(var i=0;i<auth_ids_has.length;i++){
+                       var node = zTree.getNodeByParam("id",auth_ids_has[i]);
+                       node.checked = true;
+                       zTree.updateNode(node);
+                       zTree.selectNode(node,true);
+                   }
+
+
+               });
+
+           },
+           fail:function (data) {
+               alert(data)
+           }
+       });
+
+
+
+       var role_auth_add_btn = document.getElementById("role_auth_add_btn");
+        role_auth_add_btn.onclick = function (ev) {
+            var auth_ids = document.getElementById("auth_ids").value;
+            var role_id = document.getElementById("role_id").value;
+            $.ajax({
+                url:"{{urlfor "RoleController.DoRoleAuth"}}",
+                type:"POST",
+                data:{
+                    "role_id":role_id,
+                    "auth_ids":auth_ids
+                },
+                success:function (data) {
+                    if(data["code"] == 200) {
+                        alert(data["msg"]);
+                        // 获得frame索引
+                        var index = parent.layer.getFrameIndex(window.name);
+                        //关闭当前frame
+                        parent.layer.close(index);
+                        window.location.href = "{{urlfor "RoleController.List"}}"
+                    }
+
+                },
+                fail:function (data) {
+                    alert(data)
+                }
+            })
+
+        };
+
+
+       function check_data() {
+           var auth_ids = document.getElementById("auth_ids");
+           var zTree = $.fn.zTree.getZTreeObj("treeDemo");
+           var nodes = zTree.getCheckedNodes(true);
+           var ids = "";
+           for(var k=0;k<nodes.length;k++){
+               var id = nodes[k].id;
+               console.log(id);
+               ids = id + ','+ ids
+           }
+
+           auth_ids.value = ids;
+
+
+
+       }
+
+
+    </SCRIPT>
+  </body>
+
+</html>

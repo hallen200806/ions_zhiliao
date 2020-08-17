@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/static/css/font.css">
+    <link rel="stylesheet" href="/static/css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+      <link rel="stylesheet" href="/static/sweetalert/sweetalert.css">
+      <script src="/static/sweetalert/ions_alert.js"></script>
+      <script src="/static/sweetalert/sweetalert.min.js"></script>
+  </head>
+  
+  <body>
+    <div class="x-body">
+        <form class="layui-form">
+          <div class="layui-form-item">
+              <label for="L_email" class="layui-form-label">
+                  <span class="x-red">*</span>品牌名称
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="name" name="name"  lay-verify="required"
+                  autocomplete="off" class="layui-input">
+              </div>
+              <div class="layui-form-mid layui-word-aux">
+                  <span class="x-red">*</span>唯一
+              </div>
+          </div>
+          <div class="layui-form-item">
+              <label for="L_username" class="layui-form-label">
+                  <span class="x-red">*</span>描述
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="desc" name="desc" lay-verify="password"
+                  autocomplete="off" class="layui-input">
+              </div>
+          </div>
+
+
+            <div class="layui-form-item">
+                <label for="L_repass" class="layui-form-label">
+                    <span class="x-red">*</span>是否启用
+                </label>
+                <div class="layui-input-inline">
+                    <input type="radio" name="is_active" autocomplete="off" class="layui-input" value="1" title="启用" checked>
+
+                    <input type="radio" name="is_active" required="" lay-verify="repass"
+                           autocomplete="off" class="layui-input" value="0" title="停用">
+                </div>
+            </div>
+
+
+          <div class="layui-form-item">
+              <label for="L_repass" class="layui-form-label">
+              </label>
+              <button  class="layui-btn" lay-filter="add" lay-submit type="button">
+                  提交
+              </button>
+          </div>
+      </form>
+    </div>
+    <script>
+        $(function  () {
+            layui.use('form', function () {
+                var form = layui.form;
+                //监听提交
+                form.on('submit(add)', function (data) {
+                    var name = document.getElementById("name").value;
+                    var desc = document.getElementById("desc").value;
+
+                    var is_active = $("input[name='is_active']:checked").val();
+
+
+
+                    $.ajax({
+                        url:"{{urlfor "CarBrandController.DoAdd"}}",
+                        type:"POST",
+                        data:{
+                            "name":name,
+                            "desc":desc,
+                            "is_active":is_active
+                        },
+                        success:function (data) {
+                            var code = data["code"];
+                            if(code == 200){
+                                ions_alert.alertSuccessToast(data["msg"]);
+                                setTimeout(reload_list,2000);  // 2s
+
+                            }else {
+                                ions_alert.alertErrorToast(data["msg"])
+                            }
+                        },
+                        fail:function (data) {
+                            alert(data)
+                        }
+                    });
+
+
+                    function reload_list() {
+                        // 获得frame索引
+                        var index = parent.layer.getFrameIndex(window.name);
+                        //关闭当前frame
+                        parent.layer.close(index);
+                        window.location.href = "{{urlfor "UserController.List"}}"
+                    }
+
+
+
+                });
+            })
+        })
+    </script>
+  </body>
+
+</html>

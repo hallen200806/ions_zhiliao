@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+
+    <link rel="stylesheet" href="/static/css/font.css">
+    <link rel="stylesheet" href="/static/css/xadmin.css">
+    <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+      <link rel="stylesheet" href="/static/sweetalert/sweetalert.css">
+      <script src="/static/sweetalert/ions_alert.js"></script>
+      <script src="/static/sweetalert/sweetalert.min.js"></script>
+
+      <link rel="stylesheet" href=" /static/froala_editor/css/froala_editor.css">
+      <link rel="stylesheet" href="/static/froala_editor/css/froala_style.css">
+      <link rel="stylesheet" href="/static/froala_editor/css/plugins/code_view.css">
+      <link rel="stylesheet" href="/static/froala_editor/css/plugins/image_manager.css">
+      <link rel="stylesheet" href="/static/froala_editor/css/plugins/image.css">
+      <link rel="stylesheet" href="/static/froala_editor/css/plugins/table.css">
+      <link rel="stylesheet" href="/static/froala_editor/css/plugins/video.css">
+
+  </head>
+
+
+  <body>
+    <div class="x-body">
+        <form class="layui-form">
+          <div class="layui-form-item">
+              <label for="L_email" class="layui-form-label">
+                  <span class="x-red">*</span>新闻标题
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="title" name="title"  lay-verify="required"
+                  autocomplete="off" class="layui-input" value="{{.news_data.Title}}">
+              </div>
+          </div>
+
+          <div class="layui-form-item">
+              <label for="L_username" class="layui-form-label">
+                  <span class="x-red">*</span>新闻内容
+              </label>
+              <div class="layui-input-inline">
+                  <textarea id="content" cols="30" rows="10">{{.news_data.Content}}</textarea>
+              </div>
+          </div>
+
+          <div class="layui-form-item">
+              <label for="L_pass" class="layui-form-label">
+                  <span class="x-red">*</span>栏目
+              </label>
+              <div class="layui-input-inline">
+                  <select id="category">
+                      <option value="{{.news_data.Category.Id}}">{{.news_data.Category.Name}}</option>
+                      {{range .categories}}
+                          <option value="{{.Id}}">{{.Name}}</option>
+                      {{end}}
+                  </select>
+              </div>
+          </div>
+
+
+            <div class="layui-form-item">
+                <label for="L_repass" class="layui-form-label">
+                    <span class="x-red">*</span>是否启用
+                </label>
+                <div class="layui-input-inline">
+                    {{if eq .news_data.IsActive 1}}
+                        <input type="radio" name="is_active" autocomplete="off" class="layui-input" value="1" title="启用" checked>
+
+                        <input type="radio" name="is_active" required="" lay-verify="repass"
+                               autocomplete="off" class="layui-input" value="0" title="停用">
+                    {{else}}
+                        <input type="radio" name="is_active" autocomplete="off" class="layui-input" value="1" title="启用">
+
+                        <input type="radio" name="is_active" required="" lay-verify="repass"
+                               autocomplete="off" class="layui-input" value="0" title="停用" checked>
+                    {{end}}
+                </div>
+            </div>
+
+
+          <div class="layui-form-item">
+              <input type="hidden" id="news_id" value="{{.news_data.Id}}">
+              <label for="L_repass" class="layui-form-label">
+              </label>
+              <button  class="layui-btn" type="submit">
+                  提交
+              </button>
+          </div>
+      </form>
+    </div>
+
+    <script type="text/javascript" src="/static/froala_editor/js/froala_editor.min.js"></script>
+    <script type="text/javascript" src="/static/froala_editor/js/plugins/align.min.js"></script>
+    <script type="text/javascript" src="/static/froala_editor/js/plugins/code_beautifier.min.js"></script>
+    <script type="text/javascript" src="/static/froala_editor/js/plugins/code_view.min.js"></script>
+    <script type="text/javascript" src="/static/froala_editor/js/plugins/draggable.min.js"></script>
+    <script type="text/javascript" src="/static/froala_editor/js/plugins/image.min.js"></script>
+    <script type="text/javascript" src="/static/froala_editor/js/plugins/image_manager.min.js"></script>
+    <script type="text/javascript" src="/static/froala_editor/js/plugins/link.min.js"></script>
+    <script type="text/javascript" src="/static/froala_editor/js/plugins/lists.min.js"></script>
+    <script type="text/javascript" src="/static/froala_editor/js/plugins/paragraph_format.min.js"></script>
+    <script type="text/javascript" src="/static/froala_editor/js/plugins/paragraph_style.min.js"></script>
+    <script type="text/javascript" src="/static/froala_editor/js/plugins/table.min.js"></script>
+    <script type="text/javascript" src="/static/froala_editor/js/plugins/video.min.js"></script>
+
+    <script>
+        $(function  () {
+            var editor = new FroalaEditor("#content",{
+                width:500,
+                height:200,
+                placeholderText:"请输入新闻内容",
+                charCounterCount:true,
+                language:"zh_cn",
+                imageUploadMethod:"POST",
+                imageUploadURL:"{{urlfor "NewsController.UploadImg"}}",
+                toolbarButtons: ['bold', 'italic', 'underline', 'paragraphFormat', 'align','color','fontSize','insertImage','insertTable','undo', 'redo'],
+                events:{
+                    initialized:function () {
+                        const editor = this;
+                        this.el.closest('form').addEventListener('submit', function (e) {
+                            var content = editor.$oel.val();
+                            var title = document.getElementById("title").value;
+                            var news_id = document.getElementById("news_id").value;
+                            var category_id = document.getElementById("category").value;
+                            var is_active = $("input[name='is_active']:checked").val();
+
+                            if (category_id == 0){
+                                alert("请选择栏目");
+                                return
+
+                            }
+
+                            if (title.length == 0){
+                                alert("请填写标题");
+                                return
+                            }
+
+                            $.ajax({
+                                url:"{{urlfor "NewsController.DoEdit"}}",
+                                type:"POST",
+                                data:{
+                                    "content":content,
+                                    "title":title,
+                                    "category_id":category_id,
+                                    "is_active":is_active,
+                                    "news_id":news_id
+                                },
+                                success:function (data) {
+                                    var code = data["code"];
+                                    if(code == 200){
+                                        alert(data["msg"]);
+                                        // 获得frame索引
+                                        var index = parent.layer.getFrameIndex(window.name);
+                                        //关闭当前frame
+                                        parent.layer.close(index);
+                                        window.location.href = "{{urlfor "NewsController.Get"}}"
+
+                                        // ions_alert.alertSuccessToast(data["msg"]);
+                                        // setTimeout(reload_list,2000);  // 2s
+
+                                    }else {
+                                        alert(data["msg"]);
+                                        // ions_alert.alertErrorToast(data["msg"])
+                                    }
+                                },
+                                fail:function (data) {
+                                    alert(data)
+                                }
+                            });
+
+
+
+                            function reload_list() {
+                                // 获得frame索引
+                                var index = parent.layer.getFrameIndex(window.name);
+                                //关闭当前frame
+                                parent.layer.close(index);
+                                window.location.href = "{{urlfor "NewsController.Get"}}"
+                            }
+
+
+
+
+                        })
+
+                    }
+                }
+
+            });
+
+        })
+    </script>
+  </body>
+
+</html>

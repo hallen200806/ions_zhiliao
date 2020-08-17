@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>后台系统管理</title>
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/static/css/font.css">
+    <link rel="stylesheet" href="/static/css/xadmin.css">
+    <script src="/static/js/jquery.min.js"></script>
+</head>
+<body>
+
+<div class="x-nav">
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+</div>
+
+
+<div class="x-body">
+    <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+    <div id="main" style="width: 100%;height:400px;">
+
+    </div>
+
+</div>
+<script src="//cdn.bootcss.com/echarts/3.3.2/echarts.min.js" charset="utf-8"></script>
+
+<script type="text/javascript">
+
+    $.ajax({
+        url:"{{urlfor "EchartsCaiwuController.GetCaiWuChart"}}",
+        type:"GET",
+        data:{},
+        success:function (data) {
+            var caiwu_date = data["caiwu_date"];
+            var sales_volume = data["sales_volume"];
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('main'));
+
+            // 指定图表的配置项和数据
+            var option =  {
+                xAxis: {
+                    type: 'category',
+                    // data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                    data: caiwu_date
+                },
+                yAxis: {
+                    type: 'value'
+                },
+                series: [{
+                    // data: [820, 932, 901, 934, 1290, 1330, 1320],
+                    data: sales_volume,
+                    type: 'line'
+                }]
+            };
+
+
+
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+
+
+        },
+        fail:function (data) {
+
+        }
+
+    });
+
+
+
+</script>
+
+</body>
+</html>

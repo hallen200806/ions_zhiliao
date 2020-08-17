@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>后台系统管理</title>
+	<meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/static/css/font.css">
+	<link rel="stylesheet" href="/static/css/xadmin.css">
+    <link rel="icon" href="/static/images/zlkt.ico" type="image/x-icon"/>
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="/static/lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/xadmin.js"></script>
+
+</head>
+<body>
+    <!-- 顶部开始 -->
+    <div class="container">
+        <div class="logo"><a href="./index.html">内部办公网系统</a></div>
+        <div class="left_open">
+            <i title="展开左侧栏" class="iconfont">&#xe699;</i>
+        </div>
+
+        <ul class="layui-nav right" lay-filter="">
+          <li class="layui-nav-item">
+            <a href="javascript:;"><span class="tag">{{.notify_count}}</span>{{.user.UserName}}</a>
+            <dl class="layui-nav-child"> <!-- 二级菜单 -->
+              <dd><a style="cursor: pointer" onclick="x_admin_show('个人信息','{{urlfor "MyCenterController.Get"}}')">个人信息</a></dd>
+              <dd><a style="cursor: pointer"  onclick="x_admin_show('消息通知','{{urlfor "HomeController.NotifyList"}}')">消息通知</a></dd>
+              <dd><a href="{{urlfor "LoginController.LogOut"}}">退出</a></dd>
+            </dl>
+          </li>
+          <li class="layui-nav-item to-index"><a href="https://www.zhiliaoketang.cn/" target="_blank">前台首页</a></li>
+        </ul>
+        
+    </div>
+    <!-- 顶部结束 -->
+    <!-- 中部开始 -->
+     <!-- 左侧菜单开始 -->
+    <div class="left-nav">
+      <div id="side-nav">
+        <ul id="nav">
+
+            {{range .trees}}
+
+                <li>
+                    <a href="javascript:;">
+                        <i class="iconfont">&#xe6b8;</i>
+                        <cite>{{.AuthName}}</cite>
+                        <i class="iconfont nav_right">&#xe697;</i>
+                    </a>
+                    {{range .Children}}
+
+                        <ul class="sub-menu">
+                            <li>
+                                {{/*<a _href="{{urlfor "UserController.List"}}">*/}}
+                                <a _href="{{urlfor .UrlFor}}">
+                                    <i class="iconfont">&#xe6a7;</i>
+                                    <cite>{{.AuthName}}</cite>
+                                </a>
+                            </li >
+                        </ul>
+                    {{end}}
+                </li>
+            {{end}}
+
+
+
+            {{/*<li>*/}}
+                {{/*<a href="javascript:;">*/}}
+                    {{/*<i class="iconfont">&#xe6b8;</i>*/}}
+                    {{/*<cite>用户管理</cite>*/}}
+                    {{/*<i class="iconfont nav_right">&#xe697;</i>*/}}
+                {{/*</a>*/}}
+                {{/*<ul class="sub-menu">*/}}
+                    {{/*<li>*/}}
+                        {{/*<a _href="{{urlfor "UserController.List"}}">*/}}
+                            {{/*<i class="iconfont">&#xe6a7;</i>*/}}
+                            {{/*<cite>用户列表</cite>*/}}
+                        {{/*</a>*/}}
+                    {{/*</li >*/}}
+                {{/*</ul>*/}}
+            {{/*</li>*/}}
+
+
+            {{/*<li>*/}}
+                {{/*<a href="javascript:;">*/}}
+                    {{/*<i class="iconfont">&#xe723;</i>*/}}
+                    {{/*<cite>个人中心</cite>*/}}
+                    {{/*<i class="iconfont nav_right">&#xe697;</i>*/}}
+                {{/*</a>*/}}
+                {{/*<ul class="sub-menu">*/}}
+                    {{/*<li>*/}}
+                        {{/*<a _href="payslip-list.html">*/}}
+                        {{/*<a _href="{{urlfor "AuthController.TestTree"}}">*/}}
+                            {{/*<i class="iconfont">&#xe6a7;</i>*/}}
+                            {{/*<cite>工资条</cite>*/}}
+                        {{/*</a>*/}}
+                    {{/*</li >*/}}
+                {{/*</ul>*/}}
+            {{/*</li>*/}}
+
+            {{/*<li>*/}}
+                {{/*<a href="javascript:;">*/}}
+                    {{/*<i class="iconfont">&#xe723;</i>*/}}
+                    {{/*<cite>财务中心</cite>*/}}
+                    {{/*<i class="iconfont nav_right">&#xe697;</i>*/}}
+                {{/*</a>*/}}
+                {{/*<ul class="sub-menu">*/}}
+                    {{/*<li>*/}}
+                        {{/*<a _href="pays-list.html">*/}}
+                            {{/*<i class="iconfont">&#xe6a7;</i>*/}}
+                            {{/*<cite>工资管理</cite>*/}}
+                        {{/*</a>*/}}
+                    {{/*</li >*/}}
+
+                    {{/*<li>*/}}
+                        {{/*<a _href="caiwu-baobiao-list.html">*/}}
+                            {{/*<i class="iconfont">&#xe6a7;</i>*/}}
+                            {{/*<cite>财务报表</cite>*/}}
+                        {{/*</a>*/}}
+                    {{/*</li >*/}}
+                {{/*</ul>*/}}
+            {{/*</li>*/}}
+
+            {{/*<li>*/}}
+                {{/*<a href="javascript:;">*/}}
+                    {{/*<i class="iconfont">&#xe723;</i>*/}}
+                    {{/*<cite>内容管理</cite>*/}}
+                    {{/*<i class="iconfont nav_right">&#xe697;</i>*/}}
+                {{/*</a>*/}}
+                {{/*<ul class="sub-menu">*/}}
+                    {{/*<li>*/}}
+                        {{/*<a _href="news-list.html">*/}}
+                            {{/*<i class="iconfont">&#xe6a7;</i>*/}}
+                            {{/*<cite>新闻列表</cite>*/}}
+                        {{/*</a>*/}}
+                    {{/*</li >*/}}
+
+                    {{/*<li>*/}}
+                        {{/*<a _href="category-list.html">*/}}
+                            {{/*<i class="iconfont">&#xe6a7;</i>*/}}
+                            {{/*<cite>栏目管理</cite>*/}}
+                        {{/*</a>*/}}
+                    {{/*</li >*/}}
+                {{/*</ul>*/}}
+            {{/*</li>*/}}
+
+            {{/*<li>*/}}
+                {{/*<a href="javascript:;">*/}}
+                    {{/*<i class="iconfont">&#xe723;</i>*/}}
+                    {{/*<cite>车辆管理</cite>*/}}
+                    {{/*<i class="iconfont nav_right">&#xe697;</i>*/}}
+                {{/*</a>*/}}
+                {{/*<ul class="sub-menu">*/}}
+                    {{/*<li>*/}}
+                        {{/*<a _href="car-list.html">*/}}
+                            {{/*<i class="iconfont">&#xe6a7;</i>*/}}
+                            {{/*<cite>车辆列表</cite>*/}}
+                        {{/*</a>*/}}
+                    {{/*</li >*/}}
+
+                    {{/*<li>*/}}
+                        {{/*<a _href="car-category-list.html">*/}}
+                            {{/*<i class="iconfont">&#xe6a7;</i>*/}}
+                            {{/*<cite>车辆品牌管理</cite>*/}}
+                        {{/*</a>*/}}
+                    {{/*</li >*/}}
+
+                    {{/*<li>*/}}
+                        {{/*<a _href="car-apply-list.html">*/}}
+                            {{/*<i class="iconfont">&#xe6a7;</i>*/}}
+                            {{/*<cite>车辆申请</cite>*/}}
+                        {{/*</a>*/}}
+                    {{/*</li >*/}}
+
+                    {{/*<li>*/}}
+                        {{/*<a _href="car-audit-list.html">*/}}
+                            {{/*<i class="iconfont">&#xe6a7;</i>*/}}
+                            {{/*<cite>车辆审批</cite>*/}}
+                        {{/*</a>*/}}
+                    {{/*</li >*/}}
+                {{/*</ul>*/}}
+            {{/*</li>*/}}
+
+            {{/*<li>*/}}
+                {{/*<a href="javascript:;">*/}}
+                    {{/*<i class="iconfont">&#xe723;</i>*/}}
+                    {{/*<cite>菜单管理</cite>*/}}
+                    {{/*<i class="iconfont nav_right">&#xe697;</i>*/}}
+                {{/*</a>*/}}
+                {{/*<ul class="sub-menu">*/}}
+                    {{/*<li>*/}}
+                        {{/*<a _href="menu-list.html">*/}}
+                            {{/*<i class="iconfont">&#xe6a7;</i>*/}}
+                            {{/*<cite>菜单列表</cite>*/}}
+                        {{/*</a>*/}}
+                    {{/*</li>*/}}
+
+                {{/*</ul>*/}}
+            {{/*</li>*/}}
+
+
+            {{/*<li>*/}}
+                {{/*<a href="javascript:;">*/}}
+                    {{/*<i class="iconfont">&#xe723;</i>*/}}
+                    {{/*<cite>权限管理</cite>*/}}
+                    {{/*<i class="iconfont nav_right">&#xe697;</i>*/}}
+                {{/*</a>*/}}
+                {{/*<ul class="sub-menu">*/}}
+
+                    {{/*<li>*/}}
+                        {{/*<a _href="{{urlfor "AuthController.List"}}">*/}}
+                            {{/*<i class="iconfont">&#xe6a7;</i>*/}}
+                            {{/*<cite>权限列表</cite>*/}}
+                        {{/*</a>*/}}
+                    {{/*</li>*/}}
+
+
+                    {{/*<li>*/}}
+                        {{/*<a _href="role-list.html">*/}}
+                            {{/*<i class="iconfont">&#xe6a7;</i>*/}}
+                            {{/*<cite>角色列表</cite>*/}}
+                        {{/*</a>*/}}
+                    {{/*</li>*/}}
+
+                {{/*</ul>*/}}
+            {{/*</li>*/}}
+
+
+            {{/*<li>*/}}
+                {{/*<a href="javascript:;">*/}}
+                    {{/*<i class="iconfont">&#xe6ce;</i>*/}}
+                    {{/*<cite>报表管理</cite>*/}}
+                    {{/*<i class="iconfont nav_right">&#xe697;</i>*/}}
+                {{/*</a>*/}}
+                {{/*<ul class="sub-menu">*/}}
+                    {{/*<li>*/}}
+                        {{/*<a _href="echarts_caiwu.html">*/}}
+                            {{/*<i class="iconfont">&#xe6a7;</i>*/}}
+                            {{/*<cite>财务报表</cite>*/}}
+                        {{/*</a>*/}}
+                    {{/*</li >*/}}
+                    {{/*<li>*/}}
+                        {{/*<a _href="echarts2.html">*/}}
+                            {{/*<i class="iconfont">&#xe6a7;</i>*/}}
+                            {{/*<cite>业务报表</cite>*/}}
+                        {{/*</a>*/}}
+                    {{/*</li>*/}}
+                    {{/*<!--<li>-->*/}}
+                        {{/*<!--<a _href="echarts3.html">-->*/}}
+                            {{/*<!--<i class="iconfont">&#xe6a7;</i>-->*/}}
+                            {{/*<!--<cite>地图</cite>-->*/}}
+                        {{/*<!--</a>-->*/}}
+                    {{/*<!--</li>-->*/}}
+                    {{/*<li>*/}}
+                        {{/*<a _href="echarts4.html">*/}}
+                            {{/*<i class="iconfont">&#xe6a7;</i>*/}}
+                            {{/*<cite>课程报表</cite>*/}}
+                        {{/*</a>*/}}
+                    {{/*</li>*/}}
+                    {{/*<!--<li>-->*/}}
+                        {{/*<!--<a _href="echarts5.html">-->*/}}
+                            {{/*<!--<i class="iconfont">&#xe6a7;</i>-->*/}}
+                            {{/*<!--<cite>雷达图</cite>-->*/}}
+                        {{/*<!--</a>-->*/}}
+                    {{/*<!--</li>-->*/}}
+                    {{/*<!--<li>-->*/}}
+                        {{/*<!--<a _href="echarts6.html">-->*/}}
+                            {{/*<!--<i class="iconfont">&#xe6a7;</i>-->*/}}
+                            {{/*<!--<cite>k线图</cite>-->*/}}
+                        {{/*<!--</a>-->*/}}
+                    {{/*<!--</li>-->*/}}
+                    {{/*<!--<li>-->*/}}
+                        {{/*<!--<a _href="echarts7.html">-->*/}}
+                            {{/*<!--<i class="iconfont">&#xe6a7;</i>-->*/}}
+                            {{/*<!--<cite>热力图</cite>-->*/}}
+                        {{/*<!--</a>-->*/}}
+                    {{/*<!--</li>-->*/}}
+                    {{/*<!--<li>-->*/}}
+                        {{/*<!--<a _href="echarts8.html">-->*/}}
+                            {{/*<!--<i class="iconfont">&#xe6a7;</i>-->*/}}
+                            {{/*<!--<cite>仪表图</cite>-->*/}}
+                        {{/*<!--</a>-->*/}}
+                    {{/*<!--</li>-->*/}}
+                {{/*</ul>*/}}
+            {{/*</li>*/}}
+        </ul>
+      </div>
+    </div>
+    <!-- <div class="x-slide_left"></div> -->
+    <!-- 左侧菜单结束 -->
+    <!-- 右侧主体开始 -->
+    <div class="page-content">
+        <div class="layui-tab tab" lay-filter="xbs_tab" lay-allowclose="false">
+          <ul class="layui-tab-title">
+            <li>我的桌面</li>
+          </ul>
+          <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <iframe src="{{urlfor "HomeController.Welcome"}}" frameborder="0" scrolling="yes" class="x-iframe"></iframe>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="page-content-bg"></div>
+    <!-- 右侧主体结束 -->
+    <!-- 中部结束 -->
+    <!-- 底部开始 -->
+    <div class="footer">
+        <div class="copyright">Copyright ©2017 All Rights Reserved</div>  
+    </div>
+    <!-- 底部结束 -->
+    
+</body>
+</html>

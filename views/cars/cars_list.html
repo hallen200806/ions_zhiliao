@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="/static//css/font.css">
+    <link rel="stylesheet" href="/static//css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/static//lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/static//js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+      <link rel="stylesheet" href="/static/sweetalert/sweetalert.css">
+      <script src="/static/sweetalert/ions_alert.js"></script>
+      <script src="/static/sweetalert/sweetalert.min.js"></script>
+  </head>
+  
+  <body>
+    <div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">车辆管理</a>
+        <a>
+          <cite>车辆列表</cite></a>
+      </span>
+      <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+      <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so">
+          {{/*<input class="layui-input" placeholder="开始日" name="start" id="start">*/}}
+          {{/*<input class="layui-input" placeholder="截止日" name="end" id="end">*/}}
+          <input type="text" id="username" value="{{.kw}}"  placeholder="请输入车辆名称" autocomplete="off" class="layui-input">
+          <button id="search_btn" class="layui-btn"><i class="layui-icon">&#xe615;</i></button>
+          <button id="clear_btn" class="layui-btn"><i class="layui-icon" style="line-height:30px">ဂ</i></button>
+        </form>
+      </div>
+      <xblock>
+        <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button>
+        <button class="layui-btn" onclick="x_admin_show('添加车辆','{{urlfor "CarsController.ToAdd"}}',800,450)"><i class="layui-icon"></i>添加</button>
+        <span class="x-right" style="line-height:40px">共有数据：{{.count}} 条</span>
+      </xblock>
+      <table class="layui-table">
+        <thead>
+          <tr>
+            <th>
+              <div class="layui-unselect header layui-form-checkbox" lay-skin="primary"><i class="layui-icon">&#xe605;</i></div>
+            </th>
+            <th>车辆名称</th>
+            <th>车辆品牌名称</th>
+            <th>加入时间</th>
+            <th>状态</th>
+            <th>操作</th></tr>
+        </thead>
+        <tbody>
+          {{range .cars_data}}
+          <tr>
+              <td>
+                  <div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id='{{.Id}}'><i class="layui-icon">&#xe605;</i></div>
+              </td>
+              <td>{{.Name}}</td>
+              <td>{{.CarBrand.Name}}</td>
+
+              <td>
+                {{date .CreateTime "Y-m-d H:m:s"}}
+              </td>
+              <td class="td-status">
+                  <input type="hidden" id="is_active_val" value="{{.IsActive}}">
+                  {{if eq .IsActive 1}}
+                      <span class="layui-btn layui-btn-normal layui-btn-mini">已启用</span>
+                  {{else if eq .IsActive 0}}
+                      <span class="layui-btn layui-btn-danger layui-btn-mini">已停用</span>
+                  {{end}}
+
+              </td>
+              <td class="td-manage">
+                  {{if eq .IsActive 1}}
+                      <a onclick="is_active(this,'{{.Id}}')" href="javascript:;"  title="停用">
+                          <i class="layui-icon">&#xe601;</i>
+                      {{/*<i class="layui-icon">&#xe62f;</i>*/}}
+                      </a>
+                  {{else if eq .IsActive 0}}
+                      <a onclick="is_active(this,'{{.Id}}')" href="javascript:;"  title="启用">
+                          {{/*<i class="layui-icon">&#xe601;</i>*/}}
+                      <i class="layui-icon">&#xe62f;</i>
+                      </a>
+                  {{end}}
+
+                  <a style="cursor: pointer" title="编辑" onclick="x_admin_show('编辑用户','{{urlfor "UserController.ToUpdate"}}?id={{.Id}}',600,400)">
+                      <i class="layui-icon">&#xe642;</i>
+                  </a>
+                  <a title="删除" href="{{urlfor "UserController.Delete"}}?id={{.Id}}">
+                      <i class="layui-icon">&#xe640;</i>
+                  </a>
+              </td>
+          </tr>
+          {{end}}
+
+
+        </tbody>
+      </table>
+      {{/*<div class="page">*/}}
+        {{/*<div>*/}}
+            {{/*<span>总页数:{{.countPage}}</span>*/}}
+          {{/*<a class="prev" href="{{urlfor "UserController.Get"}}?page={{.prePage}}">&lt;&lt;</a>*/}}
+          {{/*<a class="num" href="">1</a>*/}}
+          {{/*<span class="current">{{.currentPage}}</span>*/}}
+          {{/*<a class="num" href="">3</a>*/}}
+          {{/*<a class="num" href="">489</a>*/}}
+          {{/*<a class="next" href="{{urlfor "UserController.Get"}}?page={{.nextPage}}">&gt;&gt;</a>*/}}
+        {{/*</div>*/}}
+      {{/*</div>*/}}
+
+        <div class="page">
+            <div>
+                <span>总页数:{{.countPage}}</span>
+                {{/*首页和上一页*/}}
+                {{/*<a class="prev" href="{{urlfor "UserController.Get"}}?page={{.page_map.firstpage}}">&lt;&lt;</a>*/}}
+                <a class="prev" href="{{urlfor "CarsController.Get"}}?page={{.page_map.firstpage}}&kw={{.kw}}">首页</a>
+                {{/*<a class="prev" href="{{urlfor "UserController.Get"}}?page={{.prePage}}">&lt;</a>*/}}
+                <a class="prev" href="{{urlfor "CarsController.Get"}}?page={{.prePage}}&kw={{.kw}}">上一页</a>
+
+                {{/*中间页码*/}}
+                {{range .page_map.num_pages}}
+                        {{if eq $.page_map.currpage .}}
+                            <a style="border: 0px  #E2E2E2;padding: 0" href="{{urlfor "CarsController.Get"}}?page={{.}}&kw={{$.kw}}"><span class="current">{{.}}</span></a>
+                        {{else}}
+                            <a style="border: 0px #E2E2E2;padding: 0" href="{{urlfor "CarsController.Get"}}?page={{.}}&kw={{$.kw}}"><span>{{.}}</span></a>
+                        {{end}}
+
+                {{end}}
+
+
+                {{/*下一页和尾页*/}}
+                {{/*<a class="next" href="{{urlfor "UserController.Get"}}?page={{.nextPage}}">&gt;</a>*/}}
+                <a class="next" href="{{urlfor "CarsController.Get"}}?page={{.nextPage}}&kw={{.kw}}">下一页</a>
+                {{/*<a class="next" href="{{urlfor "UserController.Get"}}?page={{.page_map.lastpage}}">&gt;&gt;</a>*/}}
+                <a class="next" href="{{urlfor "CarsController.Get"}}?page={{.page_map.lastpage}}&kw={{.kw}}">尾页</a>
+            </div>
+        </div>
+
+    </div>
+    <script>
+      layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        
+        //执行一个laydate实例
+        laydate.render({
+          elem: '#start' //指定元素
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+          elem: '#end' //指定元素
+        });
+      });
+
+       /*用户-启用/停用*/
+      function is_active(obj,id){
+          var is_active_val = document.getElementById("is_active_val").value;
+          if(is_active_val == 1){
+              layer.confirm('确认要停用吗？',function(index){
+                  layer.close(index);
+                  $.ajax({
+                      url:"{{urlfor "UserController.IsActive"}}",
+                      type:"POST",
+                      data:{
+                          "is_active_val":is_active_val,
+                          "id":id
+                      },
+                      success:function (data) {
+                          ions_alert.alertSuccessToast(data["msg"]);
+                          setTimeout(reload_list,1000)
+                      },
+                      fail:function (data) {
+                          ions_alert.alertErrorToast("状态修改失败");
+                          setTimeout(reload_list,1000)
+                      }
+
+                  })
+              });
+          }
+
+
+          if(is_active_val == 0){
+              layer.confirm('确认要启用吗？',function(index){
+                  layer.close(index);
+                  $.ajax({
+                      url:"{{urlfor "UserController.IsActive"}}",
+                      type:"POST",
+                      data:{
+                          "is_active_val":is_active_val,
+                          "id":id
+                      },
+                      success:function (data) {
+                          ions_alert.alertSuccessToast(data["msg"]);
+                          setTimeout(reload_list,1000)
+                      },
+                      fail:function (data) {
+                          ions_alert.alertErrorToast("状态修改失败");
+                          setTimeout(reload_list,1000)
+                      }
+
+                  })
+              });
+          }
+
+      }
+      
+      
+      function reload_list() {
+          window.location.href = "{{urlfor "UserController.List"}}"
+      }
+
+
+      
+      /*用户-删除*/
+      function member_del(obj,id){
+          layer.confirm('确认要删除吗？',function(index){
+              //发异步删除数据
+              $(obj).parents("tr").remove();
+              layer.msg('已删除!',{icon:1,time:1000});
+          });
+      }
+
+
+
+      function delAll (argument) {
+
+          // "3,7,8"   str[0]
+          // var ids = [];
+          var ids = "";
+          var i = 0;
+          $(".layui-form-checked").each(function () {
+              var id = $(this).attr("data-id");
+              // ids.push(id)
+              if(i == 0){
+                  ids = id
+              }else {
+                  ids = ids + "," + id
+              }
+
+              i ++
+
+
+          });
+          alert(ids);
+
+        layer.confirm('确认要批量删除吗？',function(index){
+            layer.close(index);
+            $.ajax({
+                url:"{{urlfor "UserController.MuliDelete"}}",
+                type:"POST",
+                data:{
+                    "ids":JSON.stringify(ids)
+                },
+                success:function (data) {
+                    ions_alert.alertSuccessToast(data["msg"]);
+                    setTimeout(reload_list,1000)
+                },
+                fail:function (data) {
+                    ions_alert.alertErrorToast("批量删除失败");
+                    setTimeout(reload_list,1000)
+                }
+
+            })
+        });
+      }
+
+
+      var search_btn = document.getElementById("search_btn");
+      search_btn.onclick = function (ev) {
+          ev.preventDefault();
+          var kw = document.getElementById("username").value;
+          window.location.href = "{{urlfor "CarsController.Get"}}?kw=" + kw
+      };
+
+
+      var clear_btn = document.getElementById("clear_btn");
+
+      clear_btn.onclick = function (ev) {
+          ev.preventDefault();
+          window.location.href = "{{urlfor "CarsController.Get"}}"
+      }
+
+
+    </script>
+    <script>var _hmt = _hmt || []; (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();</script>
+  </body>
+
+</html>
